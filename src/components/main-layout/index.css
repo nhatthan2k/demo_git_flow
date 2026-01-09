@@ -1,0 +1,113 @@
+.scroll-top-box {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+}
+
+.main-layout-container {
+  display: flex;
+}
+
+.toolbar-inner-box {
+  flex-grow: 1;
+}
+
+.header-right-box {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* MUI gap: 1 */
+}
+
+.user-info-container {
+  position: relative;
+}
+
+.user-avatar {
+  font-size: 12px !important;
+}
+
+.username-typography {
+  font-size: 12px !important;
+  margin-left: 4px !important;
+}
+
+.mobile-dropdown-arrow-style {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid white;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+@media (min-width: 640px) {
+  .mobile-dropdown-arrow-style {
+    display: none !important;
+  }
+}
+
+.menu-item-style {
+  min-height: 32px !important;
+  padding: 4px 16px !important;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: -8px;
+}
+
+.scroll-top-fab {
+  width: 25px !important;
+  height: 25px !important;
+  min-height: 25px !important;
+}
+
+.scroll-top-icon {
+  font-size: 16px !important;
+}
+
+.MuiToolbar-root {
+  min-height: 50px !important;
+  height: 50px !important;
+}
+
+@media (min-width: 600px) {
+  /* sm breakpoint */
+  .user-avatar {
+    font-size: 14px !important;
+  }
+  .username-typography {
+    font-size: 14px !important;
+    margin-left: 8px !important;
+  }
+  .main-content {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .scroll-top-fab {
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+  .scroll-top-icon {
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 900px) {
+  /* md breakpoint */
+  .main-content {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+} 
