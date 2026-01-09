@@ -9,6 +9,7 @@ import {
   Search,
   Bell,
   ChevronDown,
+  ChevronRight,
   TrendingUp,
   Award,
   Plus,
@@ -29,12 +30,15 @@ import {
   Lock,
   PlayCircle,
   X,
+  Menu,
 } from 'lucide-react';
 
 export default function EnglishLearningAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['quan-ly']));
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
@@ -58,6 +62,56 @@ export default function EnglishLearningAdmin() {
     }
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) {
+        newSet.delete(groupId);
+      } else {
+        newSet.add(groupId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleMenuItemClick = (itemId: string) => {
+    setActiveTab(itemId);
+    // Đóng sidebar trên mobile sau khi chọn item
+    setMobileMenuOpen(false);
+  };
+
+  const menuItems = [
+    {
+      id: 'dashboard',
+      label: 'Tổng quan',
+      icon: BarChart3,
+      type: 'item' as const,
+    },
+    {
+      id: 'quan-ly',
+      label: 'Quản lý',
+      icon: BookOpen,
+      type: 'group' as const,
+      children: [
+        { id: 'students', label: 'Học viên', icon: Users },
+        { id: 'courses', label: 'Khóa học', icon: BookOpen },
+        { id: 'videos', label: 'Bài học', icon: Video },
+      ],
+    },
+    {
+      id: 'analytics',
+      label: 'Thống kê',
+      icon: TrendingUp,
+      type: 'item' as const,
+    },
+    {
+      id: 'settings',
+      label: 'Cài đặt',
+      icon: Settings,
+      type: 'item' as const,
+    },
+  ];
 
   const stats = [
     { label: 'Tổng học viên', value: '2,847', change: '+12%', icon: Users, color: 'bg-blue-500' },
@@ -452,40 +506,177 @@ export default function EnglishLearningAdmin() {
     setShowLessonModal(true);
   };
 
+  // Component render cho sidebar content (dùng chung cho desktop và mobile)
+  const renderSidebarContent = () => (
+    <>
+      <div className='flex items-center gap-3 mb-8'>
+        <div className='w-10 h-10 bg-white rounded-lg flex items-center justify-center'>
+          <BookOpen className='text-blue-900' size={24} />
+        </div>
+        <div>
+          <h1 className='text-xl font-bold'>EnglishHub</h1>
+          <p className='text-xs text-blue-200'>Admin Panel</p>
+        </div>
+      </div>
+
+      <nav className='space-y-1 flex-1 overflow-y-auto'>
+        {menuItems.map((item) => {
+          if (item.type === 'item') {
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleMenuItemClick(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  activeTab === item.id ? 'bg-white text-blue-900 shadow-lg' : 'hover:bg-blue-700'
+                }`}
+              >
+                <item.icon size={20} />
+                <span className='font-medium'>{item.label}</span>
+              </button>
+            );
+          } else {
+            const isExpanded = expandedGroups.has(item.id);
+            return (
+              <div key={item.id} className='space-y-1'>
+                <button
+                  onClick={() => toggleGroup(item.id)}
+                  className='w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all hover:bg-blue-700'
+                >
+                  <div className='flex items-center gap-3'>
+                    <item.icon size={20} />
+                    <span className='font-medium'>{item.label}</span>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronDown size={18} className='flex-shrink-0' />
+                  ) : (
+                    <ChevronRight size={18} className='flex-shrink-0' />
+                  )}
+                </button>
+                {isExpanded && item.children && (
+                  <div className='ml-4 space-y-1 border-l-2 border-blue-600 pl-2'>
+                    {item.children.map((child) => (
+                      <button
+                        key={child.id}
+                        onClick={() => handleMenuItemClick(child.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${
+                          activeTab === child.id
+                            ? 'bg-white text-blue-900 shadow-md'
+                            : 'hover:bg-blue-700 text-blue-100'
+                        }`}
+                      >
+                        <child.icon size={18} />
+                        <span className='font-medium text-sm'>{child.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+        })}
+      </nav>
+
+      <button className='w-full flex items-center gap-3 px-4 py-3 mt-auto hover:bg-blue-700 rounded-lg transition-all'>
+        <LogOut size={20} />
+        <span className='font-medium'>Đăng xuất</span>
+      </button>
+    </>
+  );
+
   return (
-    <div className='flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors'>
-      {/* Sidebar */}
-      <div className='w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white p-6 flex flex-col'>
-        <div className='flex items-center gap-3 mb-8'>
-          <div className='w-10 h-10 bg-white rounded-lg flex items-center justify-center'>
-            <BookOpen className='text-blue-900' size={24} />
+    <div className='flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors relative'>
+      {/* Mobile Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className='fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity'
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <div className='hidden md:flex w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white p-6 flex-col flex-shrink-0'>
+        {renderSidebarContent()}
+      </div>
+
+      {/* Mobile Sidebar Drawer */}
+      <div
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white p-6 flex flex-col z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className='flex items-center justify-between mb-8'>
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 bg-white rounded-lg flex items-center justify-center'>
+              <BookOpen className='text-blue-900' size={24} />
+            </div>
+            <div>
+              <h1 className='text-xl font-bold'>EnglishHub</h1>
+              <p className='text-xs text-blue-200'>Admin Panel</p>
+            </div>
           </div>
-          <div>
-            <h1 className='text-xl font-bold'>EnglishHub</h1>
-            <p className='text-xs text-blue-200'>Admin Panel</p>
-          </div>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className='p-2 hover:bg-blue-700 rounded-lg transition-colors'
+          >
+            <X size={24} />
+          </button>
         </div>
 
-        <nav className='space-y-2 flex-1'>
-          {[
-            { id: 'dashboard', icon: BarChart3, label: 'Tổng quan' },
-            { id: 'students', icon: Users, label: 'Học viên' },
-            { id: 'courses', icon: BookOpen, label: 'Khóa học' },
-            { id: 'videos', icon: Video, label: 'Bài học' },
-            { id: 'analytics', icon: TrendingUp, label: 'Thống kê' },
-            { id: 'settings', icon: Settings, label: 'Cài đặt' },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                activeTab === item.id ? 'bg-white text-blue-900 shadow-lg' : 'hover:bg-blue-700'
-              }`}
-            >
-              <item.icon size={20} />
-              <span className='font-medium'>{item.label}</span>
-            </button>
-          ))}
+        <nav className='space-y-1 flex-1 overflow-y-auto'>
+          {menuItems.map((item) => {
+            if (item.type === 'item') {
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuItemClick(item.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    activeTab === item.id ? 'bg-white text-blue-900 shadow-lg' : 'hover:bg-blue-700'
+                  }`}
+                >
+                  <item.icon size={20} />
+                  <span className='font-medium'>{item.label}</span>
+                </button>
+              );
+            } else {
+              const isExpanded = expandedGroups.has(item.id);
+              return (
+                <div key={item.id} className='space-y-1'>
+                  <button
+                    onClick={() => toggleGroup(item.id)}
+                    className='w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all hover:bg-blue-700'
+                  >
+                    <div className='flex items-center gap-3'>
+                      <item.icon size={20} />
+                      <span className='font-medium'>{item.label}</span>
+                    </div>
+                    {isExpanded ? (
+                      <ChevronDown size={18} className='flex-shrink-0' />
+                    ) : (
+                      <ChevronRight size={18} className='flex-shrink-0' />
+                    )}
+                  </button>
+                  {isExpanded && item.children && (
+                    <div className='ml-4 space-y-1 border-l-2 border-blue-600 pl-2'>
+                      {item.children.map((child) => (
+                        <button
+                          key={child.id}
+                          onClick={() => handleMenuItemClick(child.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${
+                            activeTab === child.id
+                              ? 'bg-white text-blue-900 shadow-md'
+                              : 'hover:bg-blue-700 text-blue-100'
+                          }`}
+                        >
+                          <child.icon size={18} />
+                          <span className='font-medium text-sm'>{child.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+          })}
         </nav>
 
         <button className='w-full flex items-center gap-3 px-4 py-3 mt-auto hover:bg-blue-700 rounded-lg transition-all'>
@@ -499,6 +690,15 @@ export default function EnglishLearningAdmin() {
         {/* Header */}
         <header className='bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4 transition-colors'>
           <div className='flex items-center justify-between'>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className='md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mr-2'
+              aria-label='Mở menu'
+            >
+              <Menu size={24} className='text-gray-700 dark:text-gray-300' />
+            </button>
+
             <div className='flex items-center gap-4 flex-1'>
               <div className='relative flex-1 max-w-md'>
                 <Search
