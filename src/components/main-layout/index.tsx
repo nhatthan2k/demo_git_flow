@@ -41,7 +41,6 @@ export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [open, setOpen] = useState(JSON.parse(localStorage.getItem('sidebarOpen') || 'false'));
   const [dropdown, setDropdown] = useState(null);
-  const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const handleToggle = () => setMobileOpen(!mobileOpen);
 
   const menuItems = [
@@ -95,16 +94,16 @@ export default function MainLayout() {
     localStorage.setItem('last_expire_time', expireTime);
   };
 
-  const logout = async (): Promise<void> => {
-    try {
-      window.location.assign('/login');
-      localStorage.clear();
-      sessionStorage.clear();
-      sessionStorage.setItem('is_logout', 'true');
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const logout = async (): Promise<void> => {
+  //   try {
+  //     window.location.assign('/login');
+  //     localStorage.clear();
+  //     sessionStorage.clear();
+  //     sessionStorage.setItem('is_logout', 'true');
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   useEffect(() => {
     if (isExpired) {
@@ -533,7 +532,7 @@ export default function MainLayout() {
                       transform: 'translateY(-1px)',
                     },
                   }}
-                  onClick={() => setOpenConfirmModal(true)}
+                  // onClick={() => setOpenConfirmModal(true)}
                 >
                   <Typography sx={{ fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
                     ユーザー切替
@@ -653,7 +652,7 @@ export default function MainLayout() {
                   <MenuItem onClick={() => (window.location.href = SERVICE_KOJI)}>
                     サービス一覧に戻る
                   </MenuItem>
-                  <MenuItem onClick={() => setOpenConfirmModal(true)}>ユーザー切替</MenuItem>
+                  {/* <MenuItem onClick={() => setOpenConfirmModal(true)}>ユーザー切替</MenuItem> */}
                 </Menu>
               </>
             )}
